@@ -1,6 +1,6 @@
 import os
 import ffmpeg
-import whisper
+import stable_whisper
 import argparse
 import warnings
 import tempfile
@@ -13,7 +13,7 @@ def main():
     parser.add_argument("video", nargs="+", type=str,
                         help="paths to video files to transcribe")
     parser.add_argument("--model", default="small",
-                        choices=whisper.available_models(), help="name of the Whisper model to use")
+                        help="name of the Whisper model to use")
     parser.add_argument("--output_dir", "-o", type=str,
                         default=".", help="directory to save the outputs")
     parser.add_argument("--output_srt", type=str2bool, default=False,
@@ -45,7 +45,7 @@ def main():
     elif language != "auto":
         args["language"] = language
         
-    model = whisper.load_model(model_name)
+    model = stable_whisper.load_model(model_name)
     audios = get_audio(args.pop("video"))
     subtitles = get_subtitles(
         audios, output_srt or srt_only, output_dir, lambda audio_path: model.transcribe(audio_path, **args)
@@ -103,9 +103,7 @@ def get_subtitles(audio_paths: list, output_srt: bool, output_dir: str, transcri
         result = transcribe(audio_path)
         warnings.filterwarnings("default")
 
-        with open(srt_path, "w", encoding="utf-8") as srt:
-            write_srt(result["segments"], file=srt)
-
+        result.to_srt_vtt(srt_path)
         subtitles_path[path] = srt_path
 
     return subtitles_path
