@@ -8,6 +8,7 @@ setup(
     author="Miguel Piedrafita",
     install_requires=[
         'stable-ts',
+        'ffmpeg-python',
     ],
     description="Automatically generate and embed subtitles into your videos",
     entry_points={
